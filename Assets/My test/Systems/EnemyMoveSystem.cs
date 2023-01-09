@@ -1,3 +1,4 @@
+using Lockstep.Math;
 using Unity.Burst;
 using Unity.Entities;
 using Unity.Mathematics;
@@ -23,8 +24,7 @@ namespace P001.GameView
 
         public void OnUpdate(ref SystemState state)
         {
-            var fixedDeltaTime = SystemAPI.Time.fixedDeltaTime;
-            var playerPos = float3.zero;
+            var playerPos = LVector3.zero;
             foreach (var moveData in SystemAPI.Query<PlayerMoveData>())
             {
                 playerPos = moveData.position;
@@ -32,7 +32,7 @@ namespace P001.GameView
             }
             foreach (var aspect in SystemAPI.Query<EnemyMoveAspect>())
             {
-                aspect.Move(fixedDeltaTime, playerPos);
+                aspect.Move(Define.FixedDeltaTime, playerPos);
             }
         }
     }

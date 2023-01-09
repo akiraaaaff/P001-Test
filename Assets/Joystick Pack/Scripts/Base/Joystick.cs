@@ -1,30 +1,19 @@
-﻿using UnityEngine;
+﻿using Lockstep.Math;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
-    public static float Horizontal { get { return (snapX) ? SnapFloat(input.x, AxisOptions.Horizontal) : input.x; } }
-    public static float Vertical { get { return (snapY) ? SnapFloat(input.y, AxisOptions.Vertical) : input.y; } }
-    public static Vector2 Direction { get { return new Vector2(Horizontal, Vertical); } }
-
-    public float HandleRange
-    {
-        get { return handleRange; }
-        set { handleRange = Mathf.Abs(value); }
-    }
-
-    public float DeadZone
-    {
-        get { return deadZone; }
-        set { deadZone = Mathf.Abs(value); }
-    }
+    public static LFloat Horizontal { get { return (snapX) ? SnapFloat(input.x, AxisOptions.Horizontal) : input.x; } }
+    public static LFloat Vertical { get { return (snapY) ? SnapFloat(input.y, AxisOptions.Vertical) : input.y; } }
+    public static LVector2 Direction { get { return new (Horizontal, Vertical); } }
 
     public AxisOptions AxisOptions { get { return AxisOptions; } set { axisOptions = value; } }
     public static bool SnapX { get { return snapX; } set { snapX = value; } }
     public static bool SnapY { get { return snapY; } set { snapY = value; } }
 
-    [SerializeField] private float handleRange = 1;
-    [SerializeField] private float deadZone = 0;
+    private readonly float handleRange = 1;
+    private readonly float deadZone = 0;
     private static AxisOptions axisOptions = AxisOptions.Both;
     private static bool snapX = true;
     private static bool snapY = true;
@@ -36,12 +25,10 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
     private Canvas canvas;
     private Camera cam;
 
-    public static Vector2 input = Vector2.zero;
+    public static LVector2 input = LVector2.zero;
 
     protected virtual void Start()
     {
-        HandleRange = handleRange;
-        DeadZone = deadZone;
         baseRect = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         if (canvas == null)
@@ -68,7 +55,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
         Vector2 position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
         Vector2 radius = background.sizeDelta / 2;
-        input = (eventData.position - position) / (radius * canvas.scaleFactor);
+        var input= (eventData.position - position) / (radius * canvas.scaleFactor);
         FormatInput();
         HandleInput(input.magnitude, input.normalized, radius, cam);
         handle.anchoredPosition = input * radius * handleRange;
@@ -79,57 +66,57 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         if (magnitude > deadZone)
         {
             if (magnitude > 1)
-                input = normalised;
+                input = normalised.ToLVector2();
         }
         else
-            input = Vector2.zero;
+            input = LVector2.zero;
     }
 
     private void FormatInput()
     {
         if (axisOptions == AxisOptions.Horizontal)
-            input = new Vector2(input.x, 0f);
+            input = new LVector2(input.x, LFloat.zero);
         else if (axisOptions == AxisOptions.Vertical)
-            input = new Vector2(0f, input.y);
+            input = new LVector2(LFloat.zero, input.y);
     }
 
-    private static float SnapFloat(float value, AxisOptions snapAxis)
+    private static LFloat SnapFloat(LFloat value, AxisOptions snapAxis)
     {
         if (value == 0)
             return value;
 
         if (axisOptions == AxisOptions.Both)
         {
-            float angle = Vector2.Angle(input, Vector2.up);
+            LFloat angle = LMath.AngleInt(input, LVector2.up);
             if (snapAxis == AxisOptions.Horizontal)
             {
-                if (angle < 22.5f || angle > 157.5f)
-                    return 0;
+                if (angle < new LFloat(true,22500) || angle > new LFloat(true, 157500))
+                    return LFloat.zero;
                 else
-                    return (value > 0) ? 1 : -1;
+                    return (value > 0) ? LFloat.one : -LFloat.one;
             }
             else if (snapAxis == AxisOptions.Vertical)
             {
-                if (angle > 67.5f && angle < 112.5f)
-                    return 0;
+                if (angle > new LFloat(true, 67500) && angle < new LFloat(true, 112500))
+                    return LFloat.zero;
                 else
-                    return (value > 0) ? 1 : -1;
+                    return (value > 0) ? LFloat.one : -LFloat.one;
             }
             return value;
         }
         else
         {
             if (value > 0)
-                return 1;
+                return LFloat.one;
             if (value < 0)
-                return -1;
+                return -LFloat.one;
         }
-        return 0;
+        return LFloat.zero;
     }
 
     public virtual void OnPointerUp(PointerEventData eventData)
     {
-        input = Vector2.zero;
+        input = LVector2.zero;
         handle.anchoredPosition = Vector2.zero;
     }
 

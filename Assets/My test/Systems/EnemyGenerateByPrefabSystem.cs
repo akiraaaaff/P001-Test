@@ -1,8 +1,10 @@
+using Lockstep.Math;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using Random = Unity.Mathematics.Random;
 
 namespace P001.GameView
 {
@@ -26,20 +28,20 @@ namespace P001.GameView
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var random = Random.CreateFromIndex(10);
+            Random _r = new(500);
             var generator = SystemAPI.GetSingleton<EnemyGeneratorByPrefab>();
             var cubes = CollectionHelper.CreateNativeArray<Entity>(generator.cubeCount, Allocator.Temp);
             state.EntityManager.Instantiate(generator.cubeEntityProtoType, cubes);
             foreach (var cube in cubes)
             {
-                var position = new float3(random.NextFloat(), 0, random.NextFloat());
+                var position = new LVector3(_r.NextInt(-20000, 20000), 0, _r.NextInt(-20000, 20000));
                 state.EntityManager.AddComponentData<EnemyMoveData>(cube, new EnemyMoveData
                 {
-                    moveSpeed = 2,
+                    moveSpeed = new LFloat(true,200),
                     position = position,
                 });
                 var transform = SystemAPI.GetAspectRW<TransformAspect>(cube);
-                transform.LocalPosition = position;
+                transform.LocalPosition = position.ToVector3();
             }
     
             cubes.Dispose();

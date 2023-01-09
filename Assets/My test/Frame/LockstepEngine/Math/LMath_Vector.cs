@@ -75,8 +75,12 @@ namespace Lockstep.Math
         {
             return LMath.Acos(Dot(lhs, rhs));
         }
+        public static LFloat AngleInt(LVector2 lhs, LVector2 rhs)
+        {
+            return LMath.Acos(Dot(lhs, rhs));
+        }
 
-        
-        
+
+
     }
 }

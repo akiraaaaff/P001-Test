@@ -1,8 +1,10 @@
+using Lockstep.Math;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
+using UnityEditor.AnimatedValues;
 
 namespace P001.GameView
 {
@@ -32,13 +34,14 @@ namespace P001.GameView
             int count = 0;
             foreach (var cube in cubes)
             {
+                var position = new LVector3(new LFloat(true, (count - generator.cubeCount / 2) * 1200), LFloat.zero, LFloat.zero);
                 state.EntityManager.AddComponentData<PlayerMoveData>(cube, new PlayerMoveData
                 {
-                    moveSpeed = 3
+                    moveSpeed = new LFloat(true,3000),
+                    position= position,
                 });
-                var position = new float3((count - generator.cubeCount * 0.5f) * 1.2f, 0, 0);
                 var transform = SystemAPI.GetAspectRW<TransformAspect>(cube);
-                transform.LocalPosition = position;
+                transform.LocalPosition = position.ToVector3();
                 count++;
             }
     

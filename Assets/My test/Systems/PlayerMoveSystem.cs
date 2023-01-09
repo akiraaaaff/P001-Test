@@ -22,11 +22,9 @@ namespace P001.GameView
 
         public void OnUpdate(ref SystemState state)
         {
-            var fixedDeltaTime = SystemAPI.Time.fixedDeltaTime;
-            var joystickDirection = Joystick.input;
             foreach (var aspect in SystemAPI.Query<PlayerMoveAspect>())
             {
-                aspect.Move(fixedDeltaTime, joystickDirection);
+                aspect.Move(Define.FixedDeltaTime, Joystick.input);
             }
         }
     }

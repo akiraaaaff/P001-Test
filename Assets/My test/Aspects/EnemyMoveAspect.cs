@@ -1,3 +1,4 @@
+using Lockstep.Math;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -10,11 +11,11 @@ namespace P001.GameView
         readonly RefRW<LocalTransform> localTransform;
         readonly RefRW<EnemyMoveData> moveData;
 
-        public void Move(float fixedDeltaTime, float3 targetPos)
+        public void Move(LFloat fixedDeltaTime, LVector3 targetPos)
         {
             var direction = targetPos - moveData.ValueRO.position;
             moveData.ValueRW.position += direction * moveData.ValueRO.moveSpeed * fixedDeltaTime;
-            localTransform.ValueRW.Position = moveData.ValueRO.position;
+            localTransform.ValueRW.Position = moveData.ValueRO.position.ToVector3();
         }
     }
 }
