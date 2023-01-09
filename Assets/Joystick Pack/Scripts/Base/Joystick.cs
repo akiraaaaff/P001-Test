@@ -55,10 +55,11 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
 
         Vector2 position = RectTransformUtility.WorldToScreenPoint(cam, background.position);
         Vector2 radius = background.sizeDelta / 2;
-        var input= (eventData.position - position) / (radius * canvas.scaleFactor);
+        var floatInput = (eventData.position - position) / (radius * canvas.scaleFactor);
+        input = floatInput.ToLVector2();
         FormatInput();
-        HandleInput(input.magnitude, input.normalized, radius, cam);
-        handle.anchoredPosition = input * radius * handleRange;
+        HandleInput(floatInput.magnitude, floatInput.normalized, radius, cam);
+        handle.anchoredPosition = input.ToVector2() * radius * handleRange;
     }
 
     protected virtual void HandleInput(float magnitude, Vector2 normalised, Vector2 radius, Camera cam)
