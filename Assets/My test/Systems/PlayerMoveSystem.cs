@@ -20,6 +20,7 @@ namespace P001.GameView
 
         }
 
+        //[BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             foreach (var aspect in SystemAPI.Query<PlayerMoveAspect>())

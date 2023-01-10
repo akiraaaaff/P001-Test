@@ -1,28 +1,27 @@
 using Lockstep.Math;
 using Unity.Burst;
 using Unity.Entities;
-using Unity.Mathematics;
 
 namespace P001.GameView
 {
     [BurstCompile]
     [RequireMatchingQueriesForUpdate]
     [UpdateInGroup(typeof(CreateEntitiesByPrefabSystemGroup))]
-    partial struct EnemyMoveSystem : ISystem
+    partial struct EnemyPathFindSystem : ISystem
     {
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-
+            //state.RequireForUpdate<EnemyGenerateByPrefabSystem>();
         }
-
+    
         [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
-
+    
         }
-
-        [BurstCompile]
+    
+        //[BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var playerPos = LVector3.zero;
@@ -31,9 +30,16 @@ namespace P001.GameView
                 playerPos = moveData.position;
                 break;
             }
-            foreach (var aspect in SystemAPI.Query<EnemyMoveAspect>())
+            foreach (var moveData in SystemAPI.Query<EnemyMoveData>())
             {
-                aspect.Move(Define.FixedDeltaTime, playerPos);
+                UnityEngine.Debug.LogWarning(playerPos);
+                UnityEngine.Debug.LogWarning(moveData.position);
+                var aa=NavMeshManager.FindPath(playerPos, moveData.position);
+                if (aa != null)
+                {
+                    UnityEngine.Debug.LogWarning(aa.Count);
+                    UnityEngine.Debug.LogWarning(string.Join(",",aa));
+                }
             }
         }
     }

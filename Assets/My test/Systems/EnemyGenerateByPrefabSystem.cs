@@ -34,7 +34,7 @@ namespace P001.GameView
             state.EntityManager.Instantiate(generator.cubeEntityProtoType, cubes);
             foreach (var cube in cubes)
             {
-                var position = new LVector3(_r.NextInt(-20000, 20000), 0, _r.NextInt(-20000, 20000));
+                var position = new LVector3(true,_r.NextInt(-20000, 20000), 0, _r.NextInt(-20000, 20000));
                 state.EntityManager.AddComponentData<EnemyMoveData>(cube, new EnemyMoveData
                 {
                     moveSpeed = new LFloat(true,200),
